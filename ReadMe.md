@@ -9,7 +9,7 @@ U can rename `docker.compose.yml.nografana` to `docker.compose.yml` this setup r
 
 - Copy the `config.yml.sample` and change it to `config.yml`
 - Edit `config.yml` and paste in your Steam-api-key. Feel free to change other thinks. If u need help for the config-file go to: [https://github.com/screepers/screeps-launcher]
-- Copy the `/cfg/stats_setup copy.json.sample` and change it to `/cfg/stats_setup.json`
+- Copy the `/cfg/stats_setup.json.sample` and change it to `/cfg/stats_setup.json`
 - Change Username and Password
 - run `docker-compose up -d` and Wait until it is done starting the docker images and settle on mongo status messages.
 - Open another terminal in that folder. Run `docker-compose exec screeps screeps-launcher cli`. This is a command-line interface to control your new private server.
