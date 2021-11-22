@@ -1,0 +1,31 @@
+steamKey: YOURKEY
+
+verion: latest
+mods: #ecommanded Mods
+  - screepsmod-auth
+  - screepsmod-admin-utils
+  - screepsmod-mongo
+  - screepsmod-map-tool
+  - screepsmod-dynamicmarket
+bots:
+  simplebot: screepsbot-zeswarm
+  overmind: "./bots/overmind/dist"
+  too-angel: screeps-bot-tooangel
+serverConfig:
+  map: random 1x2
+  shardName: "shard1"
+  gclToCPU: true
+  maxCPU: 300
+  baseCPU: 20
+  stepCPU: 10
+  welcomeText: |
+    <style>.screepsplus h1{  text-align: center; }</style>
+    <div class="screepsplus">
+    <h1>ScreepsPlus</h1>
+    Wecome to your own Screeps private server.<br>
+    Mods include screepsmod-auth, screepsmod-admin-utils, screepsmod-mongo, screepsmod-map-tool, screepsmod-dynamicmarket<br><br>
+    <div style="text-align: center">
+    This server is brought to you by backers on Patreon. <br>
+    <a target="_blank" href="https://www.patreon.com/bePatron?u=6867142" ><img src="https://c5.patreon.com/external/logo/become_a_patron_button.png"></a>
+    </div>
+  tickRate: 1500
