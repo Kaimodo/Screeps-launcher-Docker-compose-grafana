@@ -1,9 +1,12 @@
-# WIP Screeps-launcher-Docker-compose-grafana
+# Screeps-launcher-Docker-compose-grafana
 
 ![ ](https://screeps.com/images/logotype-animated.svg)
+![ ](/img/sampleDashboard.png)
 
-This is not completely running as of 22.11.2021
-U can rename `docker.compose.yml.nografana` to `docker.compose.yml` this setup runs smooth. I am still working on the grafana part.
+Tested on Docker-desktop(Win) and Docker(Ubuntu20).
+
+The example-dash and the stats.js are from
+[screeps-grafana](https://github.com/screepers/screeps-grafana)
 
 ## Installation steps
 
@@ -31,3 +34,23 @@ U can rename `docker.compose.yml.nografana` to `docker.compose.yml` this setup r
 ## Grafana
 
 Access Grafana at [http://localhost:3000/]. You'll find your stats in the default data source, under screeps.privateserver.
+
+More Info here: [screeps-grafana](https://github.com/screepers/screeps-grafana)
+
+## Usage example
+
+To send stats to the dashboard, simply write them to `Memory.stats`.
+
+```js
+Memory.stats["room." + room.name + ".energyAvailable"] = room.energyAvailable;
+Memory.stats["room." + room.name + ".energyCapacityAvailable"] =
+  room.energyCapacityAvailable;
+Memory.stats["room." + room.name + ".controllerProgress"] =
+  room.controller.progress;
+```
+
+## Adding Grafana Plugins
+
+Just run `docker-compose exec grafana grafana-cli plugins install grafana-clock-panel` to install the plugins, then `docker-compose restart grafana` to apply. Refresh your browser and voila!
+
+Additional Plugins can be found [here](https://grafana.com/grafana/plugins/).
