@@ -10,6 +10,8 @@ The example-dash and the stats.js are from
 
 ## (OPTIONAL) Setup Azure-Server [instructions](azure/readMe.md)
 
+## If u need to install Docker & compose look [here](azure/readMe.md)
+
 ## Installation steps
 
 - Copy the `config.yml.sample` and change it to `config.yml`
