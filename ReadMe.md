@@ -8,6 +8,8 @@ Tested on Docker-desktop(Win) and Docker(Ubuntu20).
 The example-dash and the stats.js are from
 [screeps-grafana](https://github.com/screepers/screeps-grafana)
 
+## (OPTIONAL) Setup Azure-Server [instructions](azure/readMe.md)
+
 ## Installation steps
 
 - Copy the `config.yml.sample` and change it to `config.yml`
