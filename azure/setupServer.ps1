@@ -70,18 +70,6 @@ $nsgRuleWeb = New-AzNetworkSecurityRuleConfig `
   -DestinationPortRange 21025 `
   -Access "Allow"
 
-# Create an inbound network security group rule for port 21026
-$nsgRuleWeb = New-AzNetworkSecurityRuleConfig `
-  -Name "ScreepsNetworkSecurityGroupRule21026"  `
-  -Protocol "Tcp" `
-  -Direction "Inbound" `
-  -Priority 1001 `
-  -SourceAddressPrefix * `
-  -SourcePortRange * `
-  -DestinationAddressPrefix * `
-  -DestinationPortRange 21026 `
-  -Access "Allow"
-
 # Create an inbound network security group rule for port 3000(Grafana)
 $nsgRuleWeb = New-AzNetworkSecurityRuleConfig `
   -Name "ScreepsNetworkSecurityGroupRule3000"  `
