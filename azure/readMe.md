@@ -37,6 +37,9 @@ Get the public IP of your Server via `Get-AzPublicIpAddress -ResourceGroupName "
 
 Connect to it using `ssh azureuser@IP-AddressFromAbove`
 
+Your ResourceGrp in azure-Portal should look something like this:
+![ ](../img/azureResGrp.png)
+
 ## Install Docker
 
 - `sudo apt install apt-transport-https ca-certificates curl software-properties-common`
@@ -54,6 +57,6 @@ Connect to it using `ssh azureuser@IP-AddressFromAbove`
 - `sudo git clone https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana`
 - `cd Screeps-launcher-Docker-compose-grafana`
 
-### From here [follow](../ReadMe.md)
+### From here you can [follow](../ReadMe.md)
 
 [Back to Main Readme](../ReadMe.md)
