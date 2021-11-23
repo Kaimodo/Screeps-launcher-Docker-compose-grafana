@@ -39,15 +39,28 @@ More Info here: [screeps-grafana](https://github.com/screepers/screeps-grafana)
 
 ## Usage example
 
-To send stats to the dashboard, simply write them to `Memory.stats`.
+I found a (working) Dashboard and a TS-Class [here](https://github.com/devnixs/screeps-stats-grafana)
+YOu can find it in the `grafana_sample` Folder.
+
+### Setup Step in Screeps
+
+To call it just
 
 ```js
-Memory.stats["room." + room.name + ".energyAvailable"] = room.energyAvailable;
-Memory.stats["room." + room.name + ".energyCapacityAvailable"] =
-  room.energyCapacityAvailable;
-Memory.stats["room." + room.name + ".controllerProgress"] =
-  room.controller.progress;
+import { StatsManager } from "stats-manager.ts";
 ```
+
+in your main.ts(js) and run
+
+```js
+StatsManager.runForAllRooms();
+```
+
+at the end of your Loop.
+
+### Setup Step in Grafana
+
+Import `newDash.json` as a new DashBoard and all should be working.
 
 ## Adding Grafana Plugins
 
