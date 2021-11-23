@@ -7,7 +7,7 @@ $resGroup = "Screeps"
 $location = "Westeurope"
 $subNet = "ScreepsSubnet"
 $vNet = "ScreepsMyVNET"
-$VMSize = "Standard_D1_v2" #  Standard_B2s
+$VMSize = "Standard_B2s" #  Standard_D1_v2
 $VMName = "ScreepsVM"
 
 # Create ResourceGroup
