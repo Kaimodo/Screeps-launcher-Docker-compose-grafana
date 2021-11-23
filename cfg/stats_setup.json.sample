@@ -3,7 +3,7 @@
   "methodConfig": {
     "shard": 1,
     "path": "stats",
-    "interval": 20
+    "interval": 50
   },
   "screepsAPIConfig": {
     "privateServer": true,
