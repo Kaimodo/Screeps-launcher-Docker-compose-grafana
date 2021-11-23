@@ -3,10 +3,12 @@
 ![ ](https://screeps.com/images/logotype-animated.svg)
 ![ ](/img/sampleDashboard.png)
 
-Tested on Docker-desktop(Win) and Docker(Ubuntu20).
+Tested on Docker-desktop(Win), Docker(Ubuntu20) and Azure(Cloud)
 
-The example-dash and the stats.js are from
+The example-dash and the stats.js are NOT from
 [screeps-grafana](https://github.com/screepers/screeps-grafana)
+
+i found a different one [here](https://github.com/devnixs/screeps-stats-grafana)
 
 ## (OPTIONAL) Setup Azure-Server [instructions](azure/readMe.md)
 
@@ -71,3 +73,5 @@ Import `newDash.json` as a new DashBoard and all should be working.
 Just run `docker-compose exec grafana grafana-cli plugins install grafana-clock-panel` to install the plugins, then `docker-compose restart grafana` to apply. Refresh your browser and voila!
 
 Additional Plugins can be found [here](https://grafana.com/grafana/plugins/).
+
+### When i missed to ref someone, just tell me.

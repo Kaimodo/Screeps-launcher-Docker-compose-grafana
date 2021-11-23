@@ -7,7 +7,7 @@ $resGroup = "Screeps"
 $location = "Westeurope"
 $subNet = "ScreepsSubnet"
 $vNet = "ScreepsMyVNET"
-$VMSize = "Standard_B2s" # Standard_D1_v2
+$VMSize = "Standard_D1_v2" #  Standard_B2s
 $VMName = "ScreepsVM"
 
 # Create ResourceGroup
@@ -114,7 +114,7 @@ Set-AzVMOperatingSystem `
 Set-AzVMSourceImage `
   -PublisherName "Canonical" `
   -Offer "UbuntuServer" `
-  -Skus "18.04-LTS" `
+  -Skus "20.04-LTS" `
   -Version "latest" | `
 Add-AzVMNetworkInterface `
   -Id $nic.Id
@@ -128,6 +128,6 @@ Add-AzVMSshPublicKey `
 
 New-AzVM `
   -ResourceGroupName "Screeps" `
-  -Location Westeurope -VM $vmConfig
+  -Location $location -VM $vmConfig
 
 
