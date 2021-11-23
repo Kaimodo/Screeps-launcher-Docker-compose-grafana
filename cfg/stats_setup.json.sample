@@ -1,8 +1,9 @@
 {
   "method": "memory",
   "methodConfig": {
-    "segment": 98,
-    "interval": 15
+    "shard": 1,
+    "path": "stats",
+    "interval": 20
   },
   "screepsAPIConfig": {
     "privateServer": true,
