@@ -17,10 +17,13 @@ cfg/stats_setup.json
 true
 
 #All log-files
-*.log
+**log
 
 # For debunging only
 changelog-data.json
+
+#Key-pair Files
+**pem
 
 # Numerous always-ignore extensions
 *.diff
