@@ -1,0 +1,47 @@
+{
+  "name": "screeps-launcher-docker-compose-grafana",
+  "version": "1.0.0",
+  "description": "Tutorial for installing the Screeps-launcher with D-Compose",
+  "main": "ReadMe.md",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "upd-patch": "npm version patch && npm run changelog",
+    "upd-minor": "npm version minor && npm run changelog",
+    "upd-mayor": "npm version mayor && npm run changelog",
+    "changelog": "auto-changelog --template changelog-template.hbs -p -u --commit-limit false",
+    "changelog-debug": "auto-changelog --template changelog-template.hbs -p --template json --output changelog-data.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana.git"
+  },
+  "auto-changelog": {
+    "commitLimit": false,
+    "unreleased": true,
+    "issueUrl": "https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/issues/{id}",
+    "replaceText": {
+      "[Ff]eature:": "",
+      "[Ff]ix:": "",
+      "[Bb]reak:": "",
+      "([A-Z]+-\\d+)": "[$1](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/issues/$1) - "
+    },
+    "includeBranch": [
+      "main"
+    ]
+  },
+  "keywords": [
+    "screeps",
+    "docker-compose",
+    "aws",
+    "azure"
+  ],
+  "author": "Kaimodo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/issues"
+  },
+  "homepage": "https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana#readme",
+  "devDependencies": {
+    "auto-changelog": "^2.3.0"
+  }
+}

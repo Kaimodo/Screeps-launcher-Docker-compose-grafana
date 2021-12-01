@@ -1,7 +1,23 @@
+# Files with personal-info
 /config.yml
 
 cfg/stats_setup.json
 
+
+# yarn lock file
+/yarn.lock
+
+# npm lock file (v5.0.0+)
+/package-lock.json
+
+# Ignore basic folders
+/node_modules
+
+#true-files
 true
 
+#All log-files
 *.log
+
+# For debunging only
+changelog-data.json
