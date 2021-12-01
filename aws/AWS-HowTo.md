@@ -70,7 +70,7 @@ From here you can follow this ([Guid](../ReadMe.md)) to setup the Screeps-part o
 
 ### Connect to Server via SSH
 
-`ssh -i myPSKeyPair.pem ec2-user@$MyVPCEC2Instance.PublicIpAddress` in the Folder where u executed the Create-Powershell-script(for the keypair-file).
+`ssh -i myPSKeyPair.pem ec2-user@PublicIpAddress` in the Folder where u executed the Create-Powershell-script(for the keypair-file).
 U can copy and paste the .pem file where ever you want to connect from that folder to your machine.
 
 u can use ([.\Get-AwsIP.ps1](./Get-AwsIP.ps1)) to get your IP, too. Start it like that `.\Get-AwsIP.ps1 -Region "YourRegion"`
