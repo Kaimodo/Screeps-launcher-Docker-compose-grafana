@@ -76,4 +76,4 @@ Just run `docker-compose exec grafana grafana-cli plugins install grafana-clock-
 
 Additional Plugins can be found [here](https://grafana.com/grafana/plugins/).
 
-### When i missed to ref someone, just tell me.
+### When i missed to ref someone, just tell me

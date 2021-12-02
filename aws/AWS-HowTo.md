@@ -70,14 +70,14 @@ From here you can follow this ([Guid](../ReadMe.md)) to setup the Screeps-part o
 
 ### Connect to Server via SSH
 
-`ssh -i myPSKeyPair.pem ec2-user@PublicIpAddress` in the Folder where u executed the Create-Powershell-script(for the keypair-file).
+`ssh -i myPSKeyPair.pem ec2-user@PublicIpAddress` in the Folder where u executed the Create-Powershell-script(for the key-pair-file).
 U can copy and paste the .pem file where ever you want to connect from that folder to your machine.
 
 u can use ([.\Get-AwsIP.ps1](./Get-AwsIP.ps1)) to get your IP, too. Start it like that `.\Get-AwsIP.ps1 -Region "YourRegion"`
 
 ## Delete machine (WIP as of 01.12.2021)
 
-THE DELETE Script is WIP and throws some errors. It wokrs partialy.
+THE DELETE Script is WIP and throws some errors. It works partially.
 
 to delete u can use the script ([Delete-ScreepsVM.ps1](/aws/Delete-ScreepsVM.ps1)) with those parameters:
 
