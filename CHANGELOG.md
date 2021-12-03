@@ -1,7 +1,19 @@
 #
-v1.1.1
-[2021-12-02]
+v1.1.2
+[2021-12-03]
 
+
+
+#
+v1.1.2
+[2021-12-03]
+
+### Features
+
+*
+Aure-script now works with parameters
+([`963c228`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/963c228bbc38d4b447a11d2b1ee76ef5105741ba))
+5-Files changed|449-Insertions|136-Deletions
 
 
 #
