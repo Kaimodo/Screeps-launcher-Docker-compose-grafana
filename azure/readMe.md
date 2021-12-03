@@ -16,7 +16,7 @@
 
 `ssh-keygen -m PEM -t rsa -b 4096`
 
-## Edit the setupServer.ps1
+## Script-defaults
 
 - $resGroup = "Screeps"
 - $location = "Westeurope"
@@ -25,15 +25,13 @@
 - $VMName = "ScreepsMV"
 - $VMSize = "Standard_B2s"
 
-are the standards from the file itself.
-
 ## Run ps1-file
 
-`./setupServer.ps1`
+`./setupServer.ps1 -User "USERNAME" -Password "YOURPASS"` is the minimal command. u can use `-Verbose` to get extra Info of what is going on.
 
 ## ToDo's after the script ran
 
-Get the public IP of your Server via `Get-AzPublicIpAddress -ResourceGroupName "Screeps" | Select "IpAddress"`
+Get the public IP of your Server via `Get-AzPublicIpAddress -ResourceGroupName "YOUR_RES_GRP_NAME" | Select "IpAddress"`
 
 Connect to it using `ssh azureuser@IP-AddressFromAbove`
 
