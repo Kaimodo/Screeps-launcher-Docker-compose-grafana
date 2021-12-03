@@ -1,6 +1,6 @@
 {
   "name": "screeps-launcher-docker-compose-grafana",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Tutorial for installing the Screeps-launcher with D-Compose",
   "main": "ReadMe.md",
   "scripts": {
