@@ -111,6 +111,18 @@ begin {
   Write-Verbose "$($FunctionName): Begin"
   $TempErrAct = $ErrorActionPreference
   $ErrorActionPreference = "Stop"
+  function Write-ProgressHelper {
+    param (
+        [int]$StepNumber,
+        [ValidateRange("Positive")]
+        [int]$Sleep,
+        [string]$Message
+    )
+
+    Write-Progress -Activity 'Creating VM and Resources' -Status $Message -PercentComplete (($StepNumber / $steps) * 100)
+    $script:steps = ([System.Management.Automation.PsParser]::Tokenize((Get-Content "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
+    $stepCounter = 0
+  }
 }
 
 process {
@@ -119,14 +131,17 @@ process {
     Write-Verbose "$($FunctionName): Process.try"
     
     Write-Verbose "$($FunctionName): Create ResourceGroup: $($ResGroup) in Location: $($Location)"
+    Write-ProgressHelper -Message "Create ResourceGroup: $($ResGroup) in Location: $($Location)" -Sleep 2 -StepNumber ($stepCounter++)
     New-AzResourceGroup -Name $ResGroup -Location $Location
 
     Write-Verbose "$($FunctionName): Create a subnet configuration with Name: $($SubNet)"
+    Write-ProgressHelper -Message "Create a subnet configuration with Name: $($SubNet)" -Sleep 2 -StepNumber ($stepCounter++)
     $SubNetConfig = New-AzVirtualNetworkSubnetConfig `
       -Name $SubNet `
       -AddressPrefix 192.168.1.0/24
 
     Write-Verbose "$($FunctionName): Create a virtual network"
+    Write-ProgressHelper -Message "Create a virtual network" -Sleep 2 -StepNumber ($stepCounter++)
     $VNet = New-AzVirtualNetwork `
       -ResourceGroupName $ResGroup `
       -Location $Location `
@@ -135,6 +150,7 @@ process {
       -Subnet $SubNetConfig
 
     Write-Verbose "$($FunctionName): Create a public IP address and specify a DNS name"
+    Write-ProgressHelper -Message "Create a public IP address and specify a DNS name" -Sleep 2 -StepNumber ($stepCounter++)
     $pip = New-AzPublicIpAddress `
       -ResourceGroupName $ResGroup `
       -Location $Location `
@@ -143,6 +159,7 @@ process {
       -Name "mypublicdns$(Get-Random)"
 
     Write-Verbose "$($FunctionName): Create an inbound network security group rule for port ssh"
+    Write-ProgressHelper -Message "Create an inbound network security group rule for port ssh" -Sleep 2 -StepNumber ($stepCounter++)
     $count = 1
     $nsgRuleSSH = New-AzNetworkSecurityRuleConfig `
       -Name "ScreepsNetworkSecurityGroupRuleSSH"  `
@@ -156,6 +173,7 @@ process {
       -Access "Allow"
     
     Write-Verbose "$($FunctionName): Create an inbound network security group rule for port 80"
+    Write-ProgressHelper -Message "Create an inbound network security group rule for port 80" -Sleep 2 -StepNumber ($stepCounter++)
     $count++
     $nsgRuleWeb = New-AzNetworkSecurityRuleConfig `
       -Name "ScreepsNetworkSecurityGroupRuleWWW"  `
@@ -169,6 +187,7 @@ process {
       -Access "Allow"
       
     Write-Verbose "$($FunctionName): Create an inbound network security group rule for port 21025"
+    Write-ProgressHelper -Message "Create an inbound network security group rule for port 21025" -Sleep 2 -StepNumber ($stepCounter++)
     count++
     $nsgRuleScreeps = New-AzNetworkSecurityRuleConfig `
       -Name "ScreepsNetworkSecurityGroupRule21025-Screeps"  `
@@ -182,6 +201,7 @@ process {
       -Access "Allow"
 
     Write-Verbose "$($FunctionName): Create an inbound network security group rule for port 3000 (Grafana)"
+    Write-ProgressHelper -Message "Create an inbound network security group rule for port 3000 (Grafana)" -Sleep 2 -StepNumber ($stepCounter++)
     count++
     $nsgRuleGrafana = New-AzNetworkSecurityRuleConfig `
       -Name "ScreepsNetworkSecurityGroupRule3000-Grafana"  `
@@ -195,6 +215,7 @@ process {
       -Access "Allow"
 
     Write-Verbose "$($FunctionName): Create a network security group with $(count) Rules"
+    Write-ProgressHelper -Message "Create a network security group with $(count) Rules" -Sleep 2 -StepNumber ($stepCounter++)
     $nsg = New-AzNetworkSecurityGroup `
       -ResourceGroupName $ResGroup `
       -Location $Location `
@@ -202,6 +223,7 @@ process {
       -SecurityRules $nsgRuleSSH,$nsgRuleWeb,$nsgRuleScreeps,$nsgRuleGrafana
 
     Write-Verbose "$($FunctionName): Create a virtual network card and associate with public IP address and NSG"
+    Write-ProgressHelper -Message "Create a virtual network card and associate with public IP address and NSG" -Sleep 2 -StepNumber ($stepCounter++)
     $nic = New-AzNetworkInterface `
       -Name "ScreepsNic" `
       -ResourceGroupName $ResGroup `
@@ -211,10 +233,12 @@ process {
       -NetworkSecurityGroupId $nsg.Id
 
     Write-Verbose "$($FunctionName): Define a credential object for user: $($User)"
+    Write-ProgressHelper -Message "Define a credential object for user: $($User)" -Sleep 2 -StepNumber ($stepCounter++)
     #$securePassword = ConvertTo-SecureString $Password -AsPlainText -Force
     $cred = New-Object System.Management.Automation.PSCredential ($User, $Password)
 
     Write-Verbose "$($FunctionName): Create a virtual machine configuration for VM: $($VMName) with size: $($VMSize)"
+    Write-ProgressHelper -Message "Create a virtual machine configuration for VM: $($VMName) with size: $($VMSize)" -Sleep 2 -StepNumber ($stepCounter++)
     $vmConfig = New-AzVMConfig `
       -VMName $VMName `
       -VMSize $VMSize | `
@@ -232,13 +256,15 @@ process {
       -Id $nic.Id
 
     Write-Verbose "$($FunctionName): Configure the SSH key"
-    $sshPublicKey = cat ~/.ssh/id_rsa.pub
+    Write-ProgressHelper -Message "Configure the SSH key" -Sleep 2 -StepNumber ($stepCounter++)
+    $sshPublicKey = Get-Content ~/.ssh/id_rsa.pub
     Add-AzVMSshPublicKey `
       -VM $vmconfig `
       -KeyData $sshPublicKey `
       -Path "/home/azureuser/.ssh/authorized_keys"
 
     Write-Verbose "$($FunctionName): Creating mmachine in ResourceGroup: $($ResGroup) in Location: $($Location)"
+    Write-ProgressHelper -Message "Creating mmachine in ResourceGroup: $($ResGroup) in Location: $($Location)" -Sleep 2 -StepNumber ($stepCounter++)
     New-AzVM `
       -ResourceGroupName $ResGroup `
       -Location $Location -VM $vmConfig

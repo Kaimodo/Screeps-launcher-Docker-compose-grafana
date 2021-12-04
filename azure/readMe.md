@@ -57,4 +57,8 @@ Your ResourceGrp in azure-Portal should look something like this:
 
 ### From here you can [follow](../ReadMe.md)
 
+## Remove everything
+
+If u want to remove the VM and it's resources just call `.\deleteServer -VMName "YOUR_VM_NAME"`
+
 [Back to Main Readme](../ReadMe.md)
