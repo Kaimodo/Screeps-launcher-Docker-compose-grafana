@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-    Delete VM and CleanUp on Azure
+    Delete VM and CleanUp on Microsoft Azure
 .DESCRIPTION
-	Script to delete & cleanup a VM on Amazon AWS 
+	Script to delete & cleanup a VM on Microsoft Azure
 .PARAMETER VMName
 	The Name of the Virtual-machine
 .EXAMPLE

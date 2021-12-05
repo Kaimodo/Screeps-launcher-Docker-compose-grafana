@@ -1,8 +1,8 @@
 ﻿    <#
 .SYNOPSIS
-    Create VM on AWS
+    Create VM on Azure
 .DESCRIPTION
-	Script to Auto-Generate a VM on Amazon AWS for running screeps-launcher on it
+	Script to Auto-Generate a VM on Microsoft Azure for running screeps-launcher on it
 .PARAMETER User
 	The UserName
 .PARAMETER Password
@@ -13,7 +13,7 @@
 	The Name of the Resource-Group
 .PARAMETER SubNet
 	The Name of the SubNet
-.PARAMETER $VNet
+.PARAMETER VNet
 	The Name of the Virtual-Net
 .PARAMETER VMSize
 	The size of the VM

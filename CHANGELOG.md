@@ -1,8 +1,26 @@
 #
-v1.1.2
-[2021-12-03]
+v1.1.3
+[2021-12-04]
 
 
+
+#
+v1.1.3
+[2021-12-04]
+
+### Features
+
+*
+Added Azure Delete-Script
+([`3d37977`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/3d3797707f75e0bba1bd910174dca2177a415e77))
+3-Files changed|194-Insertions|1-Deletions
+
+### Fixes
+
+*
+deleted test.ps1
+([`80d977b`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/80d977bf45d53b60a7166506ac0a58d85cd4a841))
+2-Files changed|14-Insertions|125-Deletions
 
 #
 v1.1.2

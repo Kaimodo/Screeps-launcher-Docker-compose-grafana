@@ -1,233 +1,293 @@
-
+    <#
+.SYNOPSIS
+    Create VM on Amazon AWS
+.DESCRIPTION
+	Script to Auto-Generate a VM on Amazon AWS for running screeps-launcher on it
+.PARAMETER Profilename
+	The UserName
+.PARAMETER Region
+	The Password
+.PARAMETER AvailabilityZone
+	The Location where the Server should be build
+.PARAMETER GroupName
+	The Name of the Resource-Group
+.PARAMETER SubNet
+	The Name of the SubNet
+.PARAMETER KeyFilePath
+	The Filename of the KeyFile
+.PARAMETER InstanceType
+	The size of the VM
+.EXAMPLE
+	PS C:\> .\Create-ScreepsVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -KeyFilePath "myPSKeyPair.pem" -InstanceType "t3.micro"
+	Set's up the machine with the Values
+.EXAMPLE
+	PS C:\> .\Create-ScreepsVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -Verbose
+	Set's up the machine with the default Value for the InstanceType. Gives better output of what's going on.
+.INPUTS
+	System.String
+.OUTPUTS
+	System.String
+.NOTES
+	Author: Kaimodo
+.LINK
+	https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana.git
+#>
 [CmdletBinding()]
 param(
 
     [Parameter(Position = 0, Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [System.String]
-    $ProfileName,
+    $ProfileName=$(Throw "ProfileName required."),
 
     [Parameter(Position = 1, Mandatory = $true)]
     [ValidateNotNull()]
     [System.String]
-    $Region,
+    $Region=$(Throw "Region required."),
 
     [Parameter(Position = 2, Mandatory = $true)]
     [ValidateNotNull()]
     [System.String]
-    $AvailabilityZone,
+    $AvailabilityZone=$(Throw "AvailabilityZone required."),
 
     [Parameter(Position = 3, Mandatory = $true)]
     [ValidateNotNull()]
     [System.String]
-    $GroupName,
+    $GroupName=$(Throw "GroupName required."),
 
-    [Parameter(Position = 4, Mandatory = $true)]
+    [Parameter(Position = 4, Mandatory = $false)]
     [ValidateNotNull()]
     [System.String]
-    $KeyName,
+    $KeyFilePath="myPSKeyPair.pem",
 
-    [Parameter(Position = 5)]
+    [Parameter(Position = 5, Mandatory = $false)]
     [ValidateNotNull()]
     [System.String]
     $InstanceType = "t3.micro"
 )
 
-########################################################
-## How To Create An AWS EC2 Instance Using PowerShell ##
-########################################################
- 
-## ----------------
-## Create A New VPC
-## ----------------
- 
-## Create a VPC
-$MyVPC = (New-EC2Vpc `
--CidrBlock "10.0.0.0/16" `
--ProfileName $ProfileName `
--Region $Region );
- 
-## Enable DNS hostname for your VPC
-Edit-EC2VpcAttribute `
--VpcId $MyVPC.VpcId `
--EnableDnsHostnames $true `
--ProfileName $ProfileName `
--Region $Region
+begin {
+    $FunctionName = $MyInvocation.MyCommand.Name
+    Write-Verbose "$($FunctionName): Begin"
+    $TempErrAct = $ErrorActionPreference
+    $ErrorActionPreference = "Stop"
+    function Write-ProgressHelper {
+        param (
+            [int]$StepNumber,
+            [ValidateRange("Positive")]
+            [int]$Sleep,
+            [string]$Message
+        )
+  
+    Write-Progress -Activity 'Creating VM and Resources' -Status $Message -PercentComplete (($StepNumber / $steps) * 100)
+    $script:steps = ([System.Management.Automation.PsParser]::Tokenize((Get-Content "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
+    $stepCounter = 0
+    }
+}
+
+process {
+    Write-Verbose "$($FunctionName): Process"
+    try {
+        Write-Verbose "$($FunctionName): Process.try"
+        Write-ProgressHelper -Message 'Creating VPC' -Sleep 2 -StepNumber ($stepCounter++)
+        $MyVPC = (New-EC2Vpc `
+            -CidrBlock "10.0.0.0/16" `
+            -ProfileName $ProfileName `
+            -Region $Region );
+
+        Write-ProgressHelper -Message 'Enable DNS hostname for VPC' -Sleep 2 -StepNumber ($stepCounter++)
+        Edit-EC2VpcAttribute `
+            -VpcId $MyVPC.VpcId `
+            -EnableDnsHostnames $true `
+            -ProfileName $ProfileName `
+            -Region $Region
+
+        Write-ProgressHelper -Message 'Creating SubNet' -Sleep 2 -StepNumber ($stepCounter++)
+        $MySubnet = (New-EC2Subnet `
+            -VpcId $MyVPC.VpcId `
+            -CidrBlock "10.0.1.0/24" `
+            -AvailabilityZone $AvailabilityZone `
+            -ProfileName $ProfileName `
+            -Region $Region);
+
+        Write-ProgressHelper -Message 'Enable Auto-assign Public IP on the Subnet' -Sleep 2 -StepNumber ($stepCounter++)
+        Edit-EC2SubnetAttribute `
+            -SubnetId $MySubnet.SubnetId `
+            -MapPublicIpOnLaunch $true `
+            -ProfileName $ProfileName `
+            -Region $Region
+
+        Write-ProgressHelper -Message 'Creating an Internet Gateway' -Sleep 2 -StepNumber ($stepCounter++)
+        $MyInternetGateway = New-EC2InternetGateway `
+            -ProfileName $ProfileName `
+            -Region $Region
+
+        Write-ProgressHelper -Message 'Attaching Internet gateway to VPC' -Sleep 2 -StepNumber ($stepCounter++)
+        Add-EC2InternetGateway `
+            -VpcId $MyVPC.VpcId `
+            -InternetGatewayId $MyInternetGateway.InternetGatewayId `
+            -ProfileName $ProfileName `
+            -Region $Region
+
+        Write-ProgressHelper -Message 'Creating a route table' -Sleep 2 -StepNumber ($stepCounter++)
+        $MyRouteTable = (New-EC2RouteTable `
+            -VpcId $MyVPC.VpcId `
+            -ProfileName $ProfileName `
+            -Region $Region);
+
+        Write-ProgressHelper -Message 'Creating route to Internet Gateway' -Sleep 2 -StepNumber ($stepCounter++)
+        New-EC2Route `
+            -RouteTableId $MyRouteTable.RouteTableId `
+            -DestinationCidrBlock "0.0.0.0/0" `
+            -GatewayId $MyInternetGateway.InternetGatewayId `
+            -ProfileName $ProfileName `
+            -Region $Region
+
+        Write-ProgressHelper -Message 'Associating the public subnet with route table' -Sleep 2 -StepNumber ($stepCounter++)
+        $RouteAID = (Register-EC2RouteTable `
+            -RouteTableId $MyRouteTable.RouteTableId `
+            -SubnetId $MySubnet.SubnetId `
+            -ProfileName $ProfileName `
+            -Region $Region);
+
+        Write-ProgressHelper -Message 'Create a security group' -Sleep 2 -StepNumber ($stepCounter++)
+        $MySecurityGroup = $(New-EC2SecurityGroup `
+            -GroupName $GroupName `
+            -Description "Used for SSH, Screeps and Grafana connection" `
+            -VpcId $MyVPC.VpcId `
+            -ProfileName $ProfileName `
+            -Region $Region);
+
+        Write-ProgressHelper -Message 'Create security group ingress rule for ssh' -Sleep 2 -StepNumber ($stepCounter++)
+        $IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
+        $IpRange.CidrIp = "0.0.0.0/0"
+        $IpRange.Description = "SSH from Anywhere"
+        $IpPermission = New-Object Amazon.EC2.Model.IpPermission
+        $IpPermission.IpProtocol = "tcp"
+        $IpPermission.ToPort = 22
+        $IpPermission.FromPort = 22
+        $IpPermission.Ipv4Ranges = $IpRange
+        Grant-EC2SecurityGroupIngress `
+            -GroupId $MySecurityGroup `
+            -IpPermission $IpPermission `
+            -ProfileName $ProfileName `
+            -Region $Region;
+
+        Write-ProgressHelper -Message 'Create security group ingress rule for Screeps-Server' -Sleep 2 -StepNumber ($stepCounter++)
+        $IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
+        $IpRange.CidrIp = "0.0.0.0/0"
+        $IpRange.Description = "Screeps-Server"
+        $IpPermission = New-Object Amazon.EC2.Model.IpPermission
+        $IpPermission.IpProtocol = "tcp"
+        $IpPermission.ToPort = 21025
+        $IpPermission.FromPort = 21025
+        $IpPermission.Ipv4Ranges = $IpRange
+        Grant-EC2SecurityGroupIngress `
+            -GroupId $MySecurityGroup `
+            -IpPermission $IpPermission `
+            -ProfileName $ProfileName `
+            -Region $Region;
+
+        Write-ProgressHelper -Message 'Create security group ingress rule for Screeps-Server-CLI' -Sleep 2 -StepNumber ($stepCounter++)
+        $IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
+        $IpRange.CidrIp = "0.0.0.0/0"
+        $IpRange.Description = "Screeps-Server CLI"
+        $IpPermission = New-Object Amazon.EC2.Model.IpPermission
+        $IpPermission.IpProtocol = "tcp"
+        $IpPermission.ToPort = 21026
+        $IpPermission.FromPort = 21026
+        $IpPermission.Ipv4Ranges = $IpRange
+        Grant-EC2SecurityGroupIngress `
+            -GroupId $MySecurityGroup `
+            -IpPermission $IpPermission `
+            -ProfileName $ProfileName `
+            -Region $Region;
+
+        Write-ProgressHelper -Message 'Create security group ingress rule for Grafana' -Sleep 2 -StepNumber ($stepCounter++)
+        $IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
+        $IpRange.CidrIp = "0.0.0.0/0"
+        $IpRange.Description = "Screeps-Grafana"
+        $IpPermission = New-Object Amazon.EC2.Model.IpPermission
+        $IpPermission.IpProtocol = "tcp"
+        $IpPermission.ToPort = 3000
+        $IpPermission.FromPort = 3000
+        $IpPermission.Ipv4Ranges = $IpRange
+        Grant-EC2SecurityGroupIngress `
+            -GroupId $MySecurityGroup `
+            -IpPermission $IpPermission `
+            -ProfileName $ProfileName `
+            -Region $Region;
+
+        Write-ProgressHelper -Message 'Get AMI ID For Your New EC2 Instance' -Sleep 2 -StepNumber ($stepCounter++)
+        $f1 = @{Name="state"; Value="available"}
+        $f2 = @{Name="description"; Value="Canonical, Ubuntu, 20.04 LTS, amd64 focal image build on ????-??-??"}
+        $AMI = (Get-EC2Image `
+            -Filter @($f1, $f2) `
+            -ProfileName $ProfileName `
+            -Region $Region); 
+        $Image = $AMI | Sort-Object CreationDate -Descending | Select-Object ImageId -First 1
+        $Image.ImageId
+
+        Write-ProgressHelper -Message 'Create a new key-pair' -Sleep 2 -StepNumber ($stepCounter++)
+        $FileName = Split-Path -Path $KeyFilePath -Leaf
+        $myPSKeyPair = (New-EC2KeyPair `
+            -KeyName $FileName `
+            -ProfileName $ProfileName `
+            -Region $Region); 
+                
+        
+        $myPSKeyPair.KeyMaterial | Out-File -Encoding ascii $FileName
+
+        Write-ProgressHelper -Message "Create new EC2 instance ($($InstanceType))" -Sleep 2 -StepNumber ($stepCounter++)
+        ## 
+        $MyEC2Instance = (New-EC2Instance `
+            -ImageId $Image.ImageId `
+            -AssociatePublicIp $true `
+            -InstanceType $InstanceType `
+            -KeyName $KeyFilePath `
+            -PrivateIpAddress "10.0.1.10" `
+            -SecurityGroupId $MySecurityGroup `
+            -SubnetId $MySubnet.SubnetId `
+            -ProfileName $ProfileName `
+            -Region $Region);
+
+        Write-ProgressHelper -Message "Get EC2 Instance Details" -Sleep 2 -StepNumber ($stepCounter++)
+        $f1 = @{Name="reservation-id"; Value=$MyEC2Instance.ReservationId}
+        $MyVPCEC2Instance = (Get-EC2Instance `
+            -Filter @($f1) `
+            -ProfileName $ProfileName `
+            -Region $Region).Instances
+        $MyVPCEC2Instance
 
 
-## --------------------------
-## Create A New Public Subnet
-## --------------------------
- 
-## Create a Subnet
-$MySubnet = (New-EC2Subnet `
--VpcId $MyVPC.VpcId `
--CidrBlock "10.0.1.0/24" `
--AvailabilityZone $AvailabilityZone `
--ProfileName $ProfileName `
--Region $Region);
- 
-## Enable Auto-assign Public IP on the Subnet
-Edit-EC2SubnetAttribute `
--SubnetId $MySubnet.SubnetId `
--MapPublicIpOnLaunch $true `
--ProfileName $ProfileName `
--Region $Region
- 
-## Create an Internet Gateway
-$MyInternetGateway = New-EC2InternetGateway `
--ProfileName $ProfileName `
--Region $Region
- 
-## Attach Internet gateway to your VPC
-Add-EC2InternetGateway `
--VpcId $MyVPC.VpcId `
--InternetGatewayId $MyInternetGateway.InternetGatewayId `
--ProfileName $ProfileName `
--Region $Region
- 
-## Create a route table
-$MyRouteTable = (New-EC2RouteTable `
--VpcId $MyVPC.VpcId `
--ProfileName $ProfileName `
--Region $Region);
- 
-## Create route to Internet Gateway
-New-EC2Route `
--RouteTableId $MyRouteTable.RouteTableId `
--DestinationCidrBlock "0.0.0.0/0" `
--GatewayId $MyInternetGateway.InternetGatewayId `
--ProfileName $ProfileName `
--Region $Region
- 
-## Associate the public subnet with route table
-$RouteAID = (Register-EC2RouteTable `
--RouteTableId $MyRouteTable.RouteTableId `
--SubnetId $MySubnet.SubnetId `
--ProfileName $ProfileName `
--Region $Region);
+    } catch {
 
-
-## ---------------------------
-## Create A New Security Group
-## ---------------------------
- 
-## Create a security group
-$MySecurityGroup = $(New-EC2SecurityGroup `
--GroupName $GroupName `
--Description "Used for SSH and Screeps connection" `
--VpcId $MyVPC.VpcId `
--ProfileName $ProfileName `
--Region $Region);
- 
-## Create security group ingress rules
-$IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
-$IpRange.CidrIp = "0.0.0.0/0"
-$IpRange.Description = "SSH from Anywhere"
-$IpPermission = New-Object Amazon.EC2.Model.IpPermission
-$IpPermission.IpProtocol = "tcp"
-$IpPermission.ToPort = 22
-$IpPermission.FromPort = 22
-$IpPermission.Ipv4Ranges = $IpRange
-Grant-EC2SecurityGroupIngress `
--GroupId $MySecurityGroup `
--IpPermission $IpPermission `
--ProfileName $ProfileName `
--Region $Region;
-
-## Create security group ingress rules
-$IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
-$IpRange.CidrIp = "0.0.0.0/0"
-$IpRange.Description = "Screeps-Server"
-$IpPermission = New-Object Amazon.EC2.Model.IpPermission
-$IpPermission.IpProtocol = "tcp"
-$IpPermission.ToPort = 21025
-$IpPermission.FromPort = 21025
-$IpPermission.Ipv4Ranges = $IpRange
-Grant-EC2SecurityGroupIngress `
--GroupId $MySecurityGroup `
--IpPermission $IpPermission `
--ProfileName $ProfileName `
--Region $Region;
-
-## Create security group ingress rules
-$IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
-$IpRange.CidrIp = "0.0.0.0/0"
-$IpRange.Description = "Screeps-Server CLI"
-$IpPermission = New-Object Amazon.EC2.Model.IpPermission
-$IpPermission.IpProtocol = "tcp"
-$IpPermission.ToPort = 21026
-$IpPermission.FromPort = 21026
-$IpPermission.Ipv4Ranges = $IpRange
-Grant-EC2SecurityGroupIngress `
--GroupId $MySecurityGroup `
--IpPermission $IpPermission `
--ProfileName $ProfileName `
--Region $Region;
-
-## Create security group ingress rules
-$IpRange = New-Object -TypeName Amazon.EC2.Model.IpRange
-$IpRange.CidrIp = "0.0.0.0/0"
-$IpRange.Description = "Screeps-Grafana"
-$IpPermission = New-Object Amazon.EC2.Model.IpPermission
-$IpPermission.IpProtocol = "tcp"
-$IpPermission.ToPort = 3000
-$IpPermission.FromPort = 3000
-$IpPermission.Ipv4Ranges = $IpRange
-Grant-EC2SecurityGroupIngress `
--GroupId $MySecurityGroup `
--IpPermission $IpPermission `
--ProfileName $ProfileName `
--Region $Region;
-
-
-## ------------------------------------
-## Get AMI ID For Your New EC2 Instance
-## -
-
-## Ubuntu 20 LTS
-$f1 = @{Name="state"; Value="available"}
-$f2 = @{Name="description"; Value="Canonical, Ubuntu, 20.04 LTS, amd64 focal image build on ????-??-??"}
-$AMI = (Get-EC2Image `
--Filter @($f1, $f2) `
--ProfileName $ProfileName `
--Region $Region); 
-$Image = $AMI | Sort-Object CreationDate -Descending | Select-Object ImageId -First 1
-$Image.ImageId
-
-## ---------------------
-## Create A New Key-Pair
-## ---------------------
- 
-## Create a new key-pair
-$myPSKeyPair = (New-EC2KeyPair `
--KeyName $KeyName `
--ProfileName $ProfileName `
--Region $Region); 
- 
-$myPSKeyPair.KeyMaterial | Out-File -Encoding ascii myPSKeyPair.pem
-
-
-## -------------------------
-## Create A New EC2 instance
-## -------------------------
- 
-## Create new EC2 instance
-$MyEC2Instance = (New-EC2Instance `
--ImageId $Image.ImageId `
--AssociatePublicIp $true `
--InstanceType $InstanceType `
--KeyName $KeyName `
--PrivateIpAddress "10.0.1.10" `
--SecurityGroupId $MySecurityGroup `
--SubnetId $MySubnet.SubnetId `
--ProfileName $ProfileName `
--Region $Region);
- 
-## Get EC2 Instance Details
-$f1 = @{Name="reservation-id"; Value=$MyEC2Instance.ReservationId}
-$MyVPCEC2Instance = (Get-EC2Instance `
--Filter @($f1) `
--ProfileName $ProfileName `
--Region $Region).Instances
-$MyVPCEC2Instance
+        $ExceptionLevel = 0
+        $BagroundColorErr = 'DarkRed'
+        $e = $_.Exception
+        $Msg = "[$($ExceptionLevel)] {$($e.Source)} $($e.Message)"
+        $Msg.PadLeft($Msg.Length + (2 * $ExceptionLevel)) | Write-Host -ForegroundColor Yellow -BackgroundColor $BagroundColorErr
+        $Msg.PadLeft($Msg.Length + (2 * $ExceptionLevel)) | Write-Output
+    
+        while ($e.InnerException) {
+            $ExceptionLevel++
+            if ($ExceptionLevel % 2 -eq 0) {
+                $BagroundColorErr = 'DarkRed'
+            }
+            else {
+                $BagroundColorErr = 'Black'
+            }
+    
+            $e = $e.InnerException
+    
+            $Msg = "[$($ExceptionLevel)] {$($e.Source)} $($e.Message)"
+            $Msg.PadLeft($Msg.Length + (2 * $ExceptionLevel)) | Write-Host -ForegroundColor Yellow -BackgroundColor $BagroundColorErr
+            $Msg.PadLeft($Msg.Length + (2 * $ExceptionLevel)) | Write-Output
+            }
+      }
+}
+    
+end {
+      Write-Verbose "$($FunctionName): End."
+      $ErrorActionPreference = $TempErrAct
+}
