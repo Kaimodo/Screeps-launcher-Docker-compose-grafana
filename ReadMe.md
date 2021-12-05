@@ -16,16 +16,23 @@ i found a different one [here](https://github.com/devnixs/screeps-stats-grafana)
 
 ## If u need to install Docker & compose look [here](azure/readMe.md)
 
-## Installation steps
+## Installation steps: Manual
+
+Your working folder is now `server/manual`
 
 - Copy the `config.yml.sample` and change it to `config.yml`
 - Edit `config.yml` and paste in your Steam-api-key. Feel free to change other thinks. If u need help for the config-file go to: [https://github.com/screepers/screeps-launcher]
 - Copy the `/cfg/stats_setup.json.sample` and change it to `/cfg/stats_setup.json`
 - Change Username and Password
-- run `docker-compose up -d` and Wait until it is done starting the docker images and settle on mongo status messages.
+- Copy the folder `manual` and rename it to whatever you want, it will be the base folder of your server.
+- run `docker-compose up -d` in that folder and Wait until it is done starting the docker images and settle on mongo status messages.
 - Open another terminal in that folder. Run `docker-compose exec screeps screeps-launcher cli`. This is a command-line interface to control your new private server.
 - In the CLI, run `system.resetAllData()` to initialize the database. Unless you want to poke around, use `Ctrl-d` or `Ctrl-x` to exit the cli.
 - Run `docker-compose restart screeps` to reboot the private server.
+
+## Installation steps: Auto
+
+Your working folder is now `server/auto`
 
 ## Accessing the Server
 
