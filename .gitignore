@@ -1,7 +1,7 @@
 # Files with personal-info
-/config.yml
+/server/manual/config.yml
 
-cfg/stats_setup.json
+/server/manual/cfg/stats_setup.json
 
 
 # yarn lock file
