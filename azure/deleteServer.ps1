@@ -65,7 +65,7 @@ begin {
     }
     $stepCounter = 0
 
-  }
+}
   
   process {
         Write-Verbose "$($FunctionName): Process"  
@@ -74,12 +74,12 @@ begin {
             $TS = ([System.Management.Automation.PsParser]::Tokenize((Get-Content $MyInvocation.MyCommand), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
             Write-Host -NoNewline -ForegroundColor Green "VM-name you would like to remove: $($VMName)"
             $vm = Get-AzVm -Name $VMName
-            Write-ProgressHelper -Message 'Searching VM' -Sleep 2 -StepNumber ($stepCounter++)
+            Write-ProgressHelper -Message 'Searching VM' -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
             if ($vm) {
                 Write-Verbose "$($FunctionName): VM $($VMName) exists"
-                Write-ProgressHelper -Message 'Found VM' -StepNumber ($stepCounter++)
+                Write-ProgressHelper -Message 'Found VM' -StepNumber ($stepCounter++) -TotalS $TS
                 $RGName=$vm.ResourceGroupName
-                Write-ProgressHelper -Message 'Searching Resource Group' -Sleep 2 -StepNumber ($stepCounter++)
+                Write-ProgressHelper -Message 'Searching Resource Group' -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
                 Write-Host -ForegroundColor Cyan 'Resource Group Name is identified as-' $RGName
                 $diagSa = [regex]::match($vm.DiagnosticsProfile.bootDiagnostics.storageUri, '^http[s]?://(.+?)\.').groups[1].value
                 Write-Host -ForegroundColor Cyan 'Marking Disks for deletion...'
@@ -87,7 +87,7 @@ begin {
                 $osDiskName = $vm.StorageProfile.OSDisk.Name
                 $datadisks = $vm.StorageProfile.DataDisks
                 $ResourceID = (Get-Azdisk -Name $osDiskName).id
-                Write-ProgressHelper -Message 'Searching Disks for deletion' -Sleep 2 -StepNumber ($stepCounter++)
+                Write-ProgressHelper -Message 'Searching Disks for deletion' -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
                 New-AzTag -ResourceId $ResourceID -Tag $tags | Out-Null
                 if ($vm.StorageProfile.DataDisks.Count -gt 0) {
                     foreach ($datadisks in $vm.StorageProfile.DataDisks){
@@ -122,11 +122,11 @@ begin {
                 else {
                     Write-Host -ForegroundColor Green "No Boot Diagnostics Disk found attached to the VM!"
                 }
-                Write-ProgressHelper -Message 'Removing VM' -Sleep 2 -StepNumber ($stepCounter++)
+                Write-ProgressHelper -Message 'Removing VM' -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
                 Write-Host -ForegroundColor Cyan 'Removing Virtual Machine-' $VMName 'in Resource Group-'$RGName '...'
                 $null = $vm | Remove-AzVM -Force
                 Write-Host -ForegroundColor Cyan 'Removing Network Interface Cards, Public IP Address(s) used by the VM...'
-                Write-ProgressHelper -Message 'Removing Network stuff' -Sleep 2 -StepNumber ($stepCounter++)
+                Write-ProgressHelper -Message 'Removing Network stuff' -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
                 foreach($nicUri in $vm.NetworkProfile.NetworkInterfaces.Id) {
                     $nic = Get-AzNetworkInterface -ResourceGroupName $vm.ResourceGroupName -Name $nicUri.Split('/')[-1]
                     Remove-AzNetworkInterface -Name $nic.Name -ResourceGroupName $vm.ResourceGroupName -Force
@@ -138,7 +138,7 @@ begin {
                 }
                 Write-Host -ForegroundColor Cyan 'Removing OS disk and Data Disk(s) used by the VM..'
                 Get-AzResource -tag $tags | where{$_.resourcegroupname -eq $RGName}| Remove-AzResource -force | Out-Null
-                Write-ProgressHelper -Message 'Completed removing VM' -Sleep 2 -StepNumber ($stepCounter++)
+                Write-ProgressHelper -Message 'Completed removing VM' -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
                 Write-Host -ForegroundColor Green 'Azure Virtual Machine-' $VMName 'and all the resources associated with the VM were removed sucesfully...'
             }
             else {

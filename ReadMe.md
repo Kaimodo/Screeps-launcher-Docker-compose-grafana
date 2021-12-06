@@ -14,6 +14,8 @@ i found a different one [here](https://github.com/devnixs/screeps-stats-grafana)
 
 ## (OPTIONAL) Setup AWS-Server [instructions](aws/AWS-HowTo.md)
 
+## (OPTIONAL) Setup GCE-Server [instructions](gce/ReadMe.md)
+
 ## If u need to install Docker & compose look [here](azure/readMe.md)
 
 ## Installation steps

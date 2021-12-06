@@ -6,37 +6,17 @@
 
 ## Install the Power-Shell Module
 
-`Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force`
+`Install-Module GoogleCloud -Scope CurrentUser -Repository PSGallery -Force`
 
-## Sign in
-
-`Connect-AzAccount`
-
-## Create SSH-Key
-
-`ssh-keygen -m PEM -t rsa -b 4096`
-
-## Script-defaults
-
-- $resGroup = "Screeps"
-- $location = "Westeurope"
-- $subNet = "ScreepsSubnet"
-- $vNet = "ScreepsMyVNET"
-- $VMName = "ScreepsMV"
-- $VMSize = "Standard_B2s"
+Type `gcloud init --console-only` to initialize Cloud SDK
 
 ## Run ps1-file
 
-`.\createServer.ps1 -User "USERNAME" -Password "YOURPASS"` is the minimal command. u can use `-Verbose` to get extra Info of what is going on.
+`./createServer.ps1 -ProjectName "Screeps" -Zone "europe-west3-c"` is the minimal command. u can use `-Verbose` to get extra Info of what is going on.
 
-## ToDo's after the script ran
+### GCE-Help
 
-Get the public IP of your Server via `Get-AzPublicIpAddress -ResourceGroupName "YOUR_RES_GRP_NAME" | Select "IpAddress"`
-
-Connect to it using `ssh azureuser@IP-AddressFromAbove`
-
-Your ResourceGrp in azure-Portal should look something like this:
-![ ](../img/azureResGrp.png)
+If u need help with the PS-Commands, here is some [help](https://public-wiki.iucc.ac.il/index.php/Using_PowerShell_to_manage_GCP_resources)
 
 ## Install Docker
 
@@ -59,6 +39,6 @@ Your ResourceGrp in azure-Portal should look something like this:
 
 ## Remove everything
 
-If u want to remove the VM and it's resources just call `.\deleteServer.ps1 -VMName "YOUR_VM_NAME"`
+If u want to remove the VM and it's resources just call `.\deleteServer.ps1 -ProjectName "Screeps" -Zone "europe-west3-c"`
 
 [Back to Main Readme](../ReadMe.md)

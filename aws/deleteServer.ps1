@@ -13,10 +13,10 @@
 .PARAMETER GroupName
 	The Name of the Resource-Group
 .EXAMPLE
-	PS C:\> .\Delete-ScreepsVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -KeyFilePath "myPSKeyPair.pem" -GroupName "Screeps"
+	PS C:\> .\deleteServer.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -KeyFilePath "myPSKeyPair.pem" -GroupName "Screeps"
 	Delete the machine with the Values
 .EXAMPLE
-	PS C:\> .\Delete-ScreepsVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -GroupName "Screeps" -Verbose
+	PS C:\> .\deleteServer.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -GroupName "Screeps" -Verbose
 	Delete the machine with the Values. Gives better output of what's going on.
 .INPUTS
 	System.String
@@ -90,17 +90,17 @@ process {
     try {
         Write-Verbose "$($FunctionName): Process.try"
         $TS = ([System.Management.Automation.PsParser]::Tokenize((Get-Content $MyInvocation.MyCommand), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
-        Write-ProgressHelper -Message "Getting EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Getting EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         $MyVPCEC2Instance =(Get-EC2Instance -ProfileName "Screeps").instances
 
-        Write-ProgressHelper -Message "Terminating EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Terminating EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         Remove-EC2Instance `
             -InstanceId $MyVPCEC2Instance.InstanceId `
             -Force `
             -ProfileName $ProfileName `
             -Region $Region
 
-        Write-ProgressHelper -Message "Delete key pair" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Delete key pair" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         if (Test-Path -Path $KeyFilePath) {
             try {
                 Remove-Item -Path $KeyFilePath;
@@ -124,7 +124,7 @@ process {
             -ProfileName $ProfileName `
             -Region $Region
 
-        Write-ProgressHelper -Message "Delete custom security group" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Delete custom security group" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         $SecGrp = (Get-EC2SecurityGroup | Where-Object GroupName -EQ $GroupName).GroupId
         foreach ($item in $SecGrp) {
             Remove-EC2SecurityGroup `
@@ -132,7 +132,7 @@ process {
             -Force    
         }
 
-        Write-ProgressHelper -Message "Delete the public subnet" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Delete the public subnet" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         $MySubnet = Get-EC2Subnet
         foreach ($net in $MySubnet) {
             Remove-EC2Subnet `
@@ -142,7 +142,7 @@ process {
                 -Region $Region
         }
 
-        Write-ProgressHelper -Message "Delete the route table" -Sleep 2 -StepNumber ($stepCounter++)        
+        Write-ProgressHelper -Message "Delete the route table" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS        
         $MyRouteTable = Get-EC2RouteTable
         foreach ($table in $MyRouteTable) {
             Remove-EC2RouteTable `
@@ -152,7 +152,7 @@ process {
                 -Region $Region
         }
 
-        Write-ProgressHelper -Message "Delete route AID" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Delete route AID" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         $RouteAID = Get-EC2RouteTable
         foreach ($Route in $RouteAID) {
             Unregister-EC2RouteTable `
@@ -162,7 +162,7 @@ process {
                 -Region $Region
         }   
 
-        Write-ProgressHelper -Message "Delete internet gateway" -Sleep 2 -StepNumber ($stepCounter++)
+        Write-ProgressHelper -Message "Delete internet gateway" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         $MyVPC = Get-EC2Vpc -ProfileName $ProfileName
 
         foreach ($item in $MyVPC) {

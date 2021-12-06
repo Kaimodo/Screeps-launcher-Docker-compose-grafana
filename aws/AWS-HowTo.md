@@ -38,7 +38,7 @@ EDIT: The Script is changed to auto-generate the KeyPair, you can Skip 3-6
 
 In order to Use this Script u have to activate Ubuntu 20.04 LTS in your Marketplace. ([here](https://aws.amazon.com/marketplace/pp?sku=a8jyynf4hjutohctm41o2z18m))
 
-Run ([.\Create-ScreepsVM.ps1](./Create-ScreepsVM.ps1)) Script with following Parameters:
+Run ([.\createServer.ps1](./createServer.ps1)) Script with following Parameters:
 
 - `ProfileName`: The Name of your desired Profile, eg "Screeps"
 - `Region`: Your desired Region
@@ -50,7 +50,7 @@ Run ([.\Create-ScreepsVM.ps1](./Create-ScreepsVM.ps1)) Script with following Par
 Example:
 
 ```ps
-./Create-ScreepsVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -KeyName "MyScreepsKey" -InstanceType "t3.micro"
+.\createServer.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -KeyName "MyScreepsKey" -InstanceType "t3.micro"
 ```
 
 After that u can run ([.\Connect-ScreepsVM-afterCreate.ps1](./Connect-ScreepsVM-afterCreate.ps1)) with following Params to Check the Status:
@@ -96,7 +96,7 @@ u can use ([.\Get-AwsIP.ps1](./Get-AwsIP.ps1)) to get your IP, too. Start it lik
 
 THE DELETE Script is WIP and throws some errors. It works partially.
 
-to delete u can use the script ([Delete-ScreepsVM.ps1](/aws/Delete-ScreepsVM.ps1)) with those parameters:
+to delete u can use the script ([deleteServer.ps1](/aws/deleteServer.ps1)) with those parameters:
 
 - `ProfileName`: The Name of your desired Profile, eg "Screeps"
 - `Region`: Your desired Region
@@ -106,5 +106,5 @@ to delete u can use the script ([Delete-ScreepsVM.ps1](/aws/Delete-ScreepsVM.ps1
 Example:
 
 ```ps
-.\Delete-ScreepsVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -KeyName "MyScreepsKey" -GroupName "Screeps"
+.\deleteServer.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -KeyName "MyScreepsKey" -GroupName "Screeps"
 ```
