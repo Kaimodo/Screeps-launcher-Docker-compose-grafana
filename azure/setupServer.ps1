@@ -112,23 +112,39 @@ begin {
   $TempErrAct = $ErrorActionPreference
   $ErrorActionPreference = "Stop"
   function Write-ProgressHelper {
-    param (
-        [int]$StepNumber,
-        [ValidateRange("Positive")]
-        [int]$Sleep,
-        [string]$Message
-    )
-
-    Write-Progress -Activity 'Creating VM and Resources' -Status $Message -PercentComplete (($StepNumber / $steps) * 100)
-    $script:steps = ([System.Management.Automation.PsParser]::Tokenize((Get-Content "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
-    $stepCounter = 0
+      # thanks adam!
+      # https://www.adamtheautomator.com/building-progress-bar-powershell-scripts/
+      param (
+          [int]$StepNumber,
+          [int]$TotalS,
+          [int]$Sleep,
+          [string]$Message,
+          [switch]$ExcludePercent
+      )
+      $Activity = "Creating VM and Resources"
+      if ($ExcludePercent) {
+          Write-Progress -Activity $Activity -Status $Message 
+          Start-Sleep $Sleep
+      } else {
+          if (-not $TotalS) {
+              $percentComplete = 0
+          } else {
+              $percentComplete = ($StepNumber / $TotalS) * 100
+              Write-Verbose "Perc: $($percentComplete) | SN: $($StepNumber) | TotalS: $($TotalS)"
+          }
+          Write-Progress -Activity $Activity -Status $Message -PercentComplete $percentComplete 
+          Start-Sleep $Sleep
+      }        
   }
+  $stepCounter = 0
+
 }
 
 process {
   Write-Verbose "$($FunctionName): Process"
   try {
     Write-Verbose "$($FunctionName): Process.try"
+    $TS = ([System.Management.Automation.PsParser]::Tokenize((Get-Content $MyInvocation.MyCommand), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
     
     Write-Verbose "$($FunctionName): Create ResourceGroup: $($ResGroup) in Location: $($Location)"
     Write-ProgressHelper -Message "Create ResourceGroup: $($ResGroup) in Location: $($Location)" -Sleep 2 -StepNumber ($stepCounter++)

@@ -39,18 +39,31 @@ begin {
     $TempErrAct = $ErrorActionPreference
     $ErrorActionPreference = "Stop"
     function Write-ProgressHelper {
+        # thanks adam!
+        # https://www.adamtheautomator.com/building-progress-bar-powershell-scripts/
         param (
             [int]$StepNumber,
-            [ValidateRange("Positive")]
+            [int]$TotalS,
             [int]$Sleep,
-            [string]$Message
+            [string]$Message,
+            [switch]$ExcludePercent
         )
-    
-        Write-Progress -Activity 'Deleting VM and Resources' -Status $Message -PercentComplete (($StepNumber / $steps) * 100)
+        $Activity = "Deleting VM and Resources"
+        if ($ExcludePercent) {
+            Write-Progress -Activity $Activity -Status $Message 
+            Start-Sleep $Sleep
+        } else {
+            if (-not $TotalS) {
+                $percentComplete = 0
+            } else {
+                $percentComplete = ($StepNumber / $TotalS) * 100
+                Write-Verbose "Perc: $($percentComplete) | SN: $($StepNumber) | TotalS: $($TotalS)"
+            }
+            Write-Progress -Activity $Activity -Status $Message -PercentComplete $percentComplete 
+            Start-Sleep $Sleep
+        }        
     }
-    $script:steps = ([System.Management.Automation.PsParser]::Tokenize((Get-Content "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
     $stepCounter = 0
-
 
   }
   
@@ -58,6 +71,7 @@ begin {
         Write-Verbose "$($FunctionName): Process"  
         try {
             Write-Verbose "$($FunctionName): Try"  
+            $TS = ([System.Management.Automation.PsParser]::Tokenize((Get-Content $MyInvocation.MyCommand), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
             Write-Host -NoNewline -ForegroundColor Green "VM-name you would like to remove: $($VMName)"
             $vm = Get-AzVm -Name $VMName
             Write-ProgressHelper -Message 'Searching VM' -Sleep 2 -StepNumber ($stepCounter++)

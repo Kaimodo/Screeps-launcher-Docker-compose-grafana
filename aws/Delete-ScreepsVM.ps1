@@ -57,23 +57,39 @@ begin {
     $TempErrAct = $ErrorActionPreference
     $ErrorActionPreference = "Stop"
     function Write-ProgressHelper {
+        # thanks adam!
+        # https://www.adamtheautomator.com/building-progress-bar-powershell-scripts/
         param (
             [int]$StepNumber,
-            [ValidateRange("Positive")]
+            [int]$TotalS,
             [int]$Sleep,
-            [string]$Message
+            [string]$Message,
+            [switch]$ExcludePercent
         )
-  
-    Write-Progress -Activity 'Deleting VM and Resources' -Status $Message -PercentComplete (($StepNumber / $steps) * 100)
-    $script:steps = ([System.Management.Automation.PsParser]::Tokenize((Get-Content "$PSScriptRoot\$($MyInvocation.MyCommand.Name)"), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
-    $stepCounter = 0
+        $Activity = "Deleting VM and Resources"
+        if ($ExcludePercent) {
+            Write-Progress -Activity $Activity -Status $Message 
+            Start-Sleep $Sleep
+        } else {
+            if (-not $TotalS) {
+                $percentComplete = 0
+            } else {
+                $percentComplete = ($StepNumber / $TotalS) * 100
+                Write-Verbose "Perc: $($percentComplete) | SN: $($StepNumber) | TotalS: $($TotalS)"
+            }
+            Write-Progress -Activity $Activity -Status $Message -PercentComplete $percentComplete 
+            Start-Sleep $Sleep
+        }        
     }
-}
+    $stepCounter = 0
+
+  }
 
 process {
     Write-Verbose "$($FunctionName): Process"
     try {
         Write-Verbose "$($FunctionName): Process.try"
+        $TS = ([System.Management.Automation.PsParser]::Tokenize((Get-Content $MyInvocation.MyCommand), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
         Write-ProgressHelper -Message "Getting EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++)
         $MyVPCEC2Instance =(Get-EC2Instance -ProfileName "Screeps").instances
 

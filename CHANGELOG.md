@@ -1,8 +1,26 @@
 #
-v1.1.4
+v1.1.5
 [2021-12-05]
 
 
+
+#
+v1.1.5
+[2021-12-05]
+
+### Features
+
+*
+Changed Folderstructure for Autobuilding
+([`cc20180`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/cc20180d9421c11a4ebc5b8c97e67a151bbac154))
+11-Files changed|16-Insertions|4-Deletions
+
+### Fixes
+
+*
+Eddited Main Readme
+([`86181bd`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/86181bd7da7b6ef06a1329bce75e4af787ab93bc))
+1-Files changed|9-Insertions|2-Deletions
 
 #
 v1.1.4
