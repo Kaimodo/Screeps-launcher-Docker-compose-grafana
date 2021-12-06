@@ -50,7 +50,7 @@ Access Grafana at [http://localhost:3000/]. You'll find your stats in the defaul
 
 More Info here: [screeps-grafana](https://github.com/screepers/screeps-grafana)
 
-## Usage example
+### Usage example
 
 I found a (working) Dashboard and a TS-Class [here](https://github.com/devnixs/screeps-stats-grafana)
 YOu can find it in the `grafana_sample` Folder.

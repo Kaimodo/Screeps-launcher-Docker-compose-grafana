@@ -4,6 +4,20 @@ v1.2.0
 
 
 
+### Little Patch
+
+*
+patch: Changelog
+([`9867ccd`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/9867ccd3f8de05fba8d8c1e92c5c1ce5679ed664))
+1-Files changed|25-Insertions|1-Deletions
+*
+patch: Added MD-File for Docker installation
+([`de8570e`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/de8570ecee311caa55392edf75dc641f50a48d13))
+2-Files changed|19-Insertions|1-Deletions
+*
+patch: Edited readme
+([`12d31c4`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/12d31c46468e3b5a61a4645b73899e6ac4137233))
+1-Files changed|1-Insertions|1-Deletions
 #
 v1.2.0
 [2021-12-06]
