@@ -16,7 +16,7 @@ i found a different one [here](https://github.com/devnixs/screeps-stats-grafana)
 
 ## (OPTIONAL) Setup GCE-Server [instructions](gce/ReadMe.md)
 
-## If u need to install Docker & compose look [here](azure/readMe.md)
+## If u need to install Docker & compose look [here](/compose.md)
 
 ## Installation steps
 
