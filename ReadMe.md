@@ -3,7 +3,7 @@
 ![ ](https://screeps.com/images/logotype-animated.svg)
 ![ ](/img/sampleDashboard.png)
 
-Tested on Docker-desktop(Win), Docker(Ubuntu20) and Azure(Cloud)
+Tested on Docker-desktop(Win), Docker(Ubuntu20) and Azure(Cloud) | WIP Cloud-Scripts 4 GCE and AWS
 
 The example-dash and the stats.js are NOT from
 [screeps-grafana](https://github.com/screepers/screeps-grafana)
