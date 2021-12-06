@@ -1,9 +1,33 @@
 #
-v1.1.7
+v1.2.0
 [2021-12-06]
 
 
 
+#
+v1.2.0
+[2021-12-06]
+
+### Features
+
+*
+Added GCE-Server scripts
+([`d4efdcd`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/d4efdcde9fb17b15cbbd3f24b7785c16addb3165))
+10-Files changed|427-Insertions|61-Deletions
+
+### Fixes
+
+*
+ReadMe for Serverinstallation changed
+([`e7d35c4`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/e7d35c468842a81d576fea91f29f061814b9a3b8))
+1-Files changed|1-Insertions|1-Deletions
+
+### Little Patch
+
+*
+patch: Changelog
+([`63535e2`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/63535e2844bdd99156c1a4dbd252950410c15095))
+1-Files changed|13-Insertions|1-Deletions
 #
 v1.1.7
 [2021-12-06]
