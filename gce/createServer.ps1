@@ -10,10 +10,10 @@
 .PARAMETER MachineType
 	The Type of the ec2 Machine
 .EXAMPLE
-	PS C:\> .\createServer.ps1 -ProjectName "Screeps" -Zone "europe-west3-c" -MachineType "e2-small"
+	PS C:\> .\createServer.ps1 -ProjectName "screeps" -Zone "europe-west3-c" -MachineType "e2-small"
 	Creates The Project with the given Values
 .EXAMPLE
-	PS C:\> .\createServer.ps1 -ProjectName "Screeps" -Zone "europe-west3-c"
+	PS C:\> .\createServer.ps1 -ProjectName "screeps" -Zone "europe-west3-c"
 	Creates The Project with the given Values and the Standard Machine Type
 .INPUTS
 	System.String

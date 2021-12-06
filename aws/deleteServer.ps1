@@ -90,105 +90,157 @@ process {
     try {
         Write-Verbose "$($FunctionName): Process.try"
         $TS = ([System.Management.Automation.PsParser]::Tokenize((Get-Content $MyInvocation.MyCommand), [ref]$null) | Where-Object { $_.Type -eq 'Command' -and $_.Content -eq 'Write-ProgressHelper' }).Count
+
         Write-ProgressHelper -Message "Getting EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
-        $MyVPCEC2Instance =(Get-EC2Instance -ProfileName "Screeps").instances
+        $MyVPCEC2Instance =(Get-EC2Instance -ProfileName $ProfileName).instances
 
         Write-ProgressHelper -Message "Terminating EC2-Instance" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
-        Remove-EC2Instance `
-            -InstanceId $MyVPCEC2Instance.InstanceId `
-            -Force `
-            -ProfileName $ProfileName `
-            -Region $Region
+        try {
+            Remove-EC2Instance `
+                -InstanceId $MyVPCEC2Instance.InstanceId `
+                -Force `
+                -ProfileName $ProfileName `
+                -Region $Region
+        } catch {
+            $ErrorMessage = $_.Exception.Message
+            $FailedItem = $_.Exception.ItemName
+            Write-Output "`n $ErrorMessage "
+            Write-Output "`n $FailedItem "
+        }
+        
 
         Write-ProgressHelper -Message "Delete key pair" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
         if (Test-Path -Path $KeyFilePath) {
             try {
+                $fileName = Split-Path -Path $KeyFilePath -Leaf
+                Remove-EC2KeyPair `
+                    -KeyName $fileName `
+                    -Force `
+                    -ProfileName $ProfileName `
+                    -Region $Region
                 Remove-Item -Path $KeyFilePath;
+
             } catch {
-                throw $_.Exception.Message
+                $ErrorMessage = $_.Exception.Message
+                $FailedItem = $_.Exception.ItemName
+                Write-Output "`n $ErrorMessage "
+                Write-Output "`n $FailedItem "
             } 
         } else {
             try {
                 $file = Split-Path -Path $KeyFilePath -Leaf
                 $folder = Split-Path -Path $KeyFilePath
                 Write-Host "$($FunctionName): File [$($file)] does not Exist in Folder [$($folder)]" -ForegroundColor Red
-                continue
+                $fileName = Split-Path -Path $KeyFilePath -Leaf
+                Remove-EC2KeyPair `
+                    -KeyName $fileName `
+                    -Force `
+                    -ProfileName $ProfileName `
+                    -Region $Region
             } catch {
-                throw $_.Exception.Message
+                $ErrorMessage = $_.Exception.Message
+                $FailedItem = $_.Exception.ItemName
+                Write-Output "`n $ErrorMessage "
+                Write-Output "`n $FailedItem "
             }
         }
-        $fileName = Split-Path -Path $KeyFilePath -Leaf
-        Remove-EC2KeyPair `
-            -KeyName $fileName `
-            -Force `
-            -ProfileName $ProfileName `
-            -Region $Region
+     
+        Write-ProgressHelper -Message "Get VPC" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
+        $MyVPCs = Get-EC2Vpc -ProfileName $ProfileName
+        foreach($VPC in $MyVPCs) {
+            $VPCId = $null
+            $VPCId = $VPC.VpcId
 
-        Write-ProgressHelper -Message "Delete custom security group" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
-        $SecGrp = (Get-EC2SecurityGroup | Where-Object GroupName -EQ $GroupName).GroupId
-        foreach ($item in $SecGrp) {
-            Remove-EC2SecurityGroup `
-            -GroupId $item  `
-            -Force    
-        }
-
-        Write-ProgressHelper -Message "Delete the public subnet" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
-        $MySubnet = Get-EC2Subnet
-        foreach ($net in $MySubnet) {
-            Remove-EC2Subnet `
-                -SubnetId $net.SubnetId `
-                -Force `
-                -ProfileName $ProfileName `
-                -Region $Region
-        }
-
-        Write-ProgressHelper -Message "Delete the route table" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS        
-        $MyRouteTable = Get-EC2RouteTable
-        foreach ($table in $MyRouteTable) {
-            Remove-EC2RouteTable `
-                -RouteTableId $table.RouteTableId `
-                -Force `
-                -ProfileName $ProfileName `
-                -Region $Region
-        }
-
-        Write-ProgressHelper -Message "Delete route AID" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
-        $RouteAID = Get-EC2RouteTable
-        foreach ($Route in $RouteAID) {
-            Unregister-EC2RouteTable `
-                -AssociationId $Route `
-                -Force `
-                -ProfileName $ProfileName `
-                -Region $Region
-        }   
-
-        Write-ProgressHelper -Message "Delete internet gateway" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
-        $MyVPC = Get-EC2Vpc -ProfileName $ProfileName
-
-        foreach ($item in $MyVPC) {
+            Write-ProgressHelper -Message "Dismounting Internet gateway" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
             $MyInternetGateway = Get-EC2InternetGateway -ProfileName $ProfileName -Region $Region
             foreach ($GateWay in $MyInternetGateway) {
                 Dismount-EC2InternetGateway `
-                -VpcId $item.VpcId `
+                -VpcId $VPCId `
                 -InternetGatewayId $GateWay.InternetGatewayId `
                 -Force `
                 -ProfileName $ProfileName `
                 -Region $Region
             
+            Write-ProgressHelper -Message "Removing Internet gateway" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
             Remove-EC2InternetGateway `
                 -InternetGatewayId $GateWay.InternetGatewayId `
                 -Force `
                 -ProfileName $ProfileName `
                 -Region $Region
+            }
 
-            ## Delete the vpc
-            Remove-EC2Vpc `
-                -VpcId $item.VpcId `
-                -Force `
-                -ProfileName $ProfileName `
-                -Region $Region
+            Write-ProgressHelper -Message "Delete the public subnet" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
+            $MySubnet = Get-EC2Subnet
+            foreach ($net in $MySubnet) {
+                Remove-EC2Subnet `
+                    -SubnetId $net.SubnetId `
+                    -Force `
+                    -ProfileName $ProfileName `
+                    -Region $Region
+            }
+
+            Write-ProgressHelper -Message "Delete route AID" -Sleep 2 -StepNumber ($stepCounter++) -TotalS $TS
+            $MyRouteTable = Get-EC2RouteTable
+            foreach ($table in $MyRouteTable) {
+                $RouteTableId = $null
+                $RouteTableAssociations = $null
+                $RouteTableId = $table.RouteTableId
+                $RouteTableAssociations = $table.Associations                
+                foreach ($RTBAssoc in $RouteTableAssociations) {
+                    if (!$RTBAssoc.Main) {
+                        try {
+                            Write-ProgressHelper -Message "Unregister RoteTable" -Sleep 1 -StepNumber ($stepCounter++) -TotalS $TS
+                            $RTBUnregister = Unregister-EC2RouteTable -AssociationId $RTBAssocId -Region $Region -Force
+                        } catch {
+                            ErrorMessage = $_.Exception.Message
+                            $FailedItem = $_.Exception.ItemName
+                            Write-Output "`n $ErrorMessage "
+                            Write-Output "`n $FailedItem "
+                        }
+                        try {
+                            Write-ProgressHelper -Message "Delete RoteTable" -Sleep 1 -StepNumber ($stepCounter++) -TotalS $TS
+                            $RTBDelete = Remove-EC2RouteTable -RouteTableId $RouteTableId -Region $Region -Force
+                        } catch {
+                            ErrorMessage = $_.Exception.Message
+                            $FailedItem = $_.Exception.ItemName
+                            Write-Output "`n $ErrorMessage "
+                            Write-Output "`n $FailedItem "
+                        }                        
+                    }
+                }
+                try {
+                    $SecurityGroups = $null
+                    $SecurityGroups = (Get-EC2SecurityGroup | Where-Object GroupName -EQ $GroupName).GroupId
+                    
+                    foreach($SecurityGroup in $SecurityGroups) {
+                        Write-ProgressHelper -Message "Removing Security Group $($SecurityGroup.GroupName)" -Sleep 1 -StepNumber ($stepCounter++) -TotalS $TS
+                        $SecurityGroupName = $null
+                        $SecurityGroupName = $SecurityGroup.GroupName
+                        $SecurityGroupId = $null
+                        $SecurityGroupId = $SecurityGroup.GroupId
+                        Remove-EC2SecurityGroup `
+                            -GroupId $SecurityGroupId  `
+                            -GroupName $SecurityGroupName `
+                            -Force
+                    }
+                } catch {
+                    $ErrorMessage = $_.Exception.Message
+                    $FailedItem = $_.Exception.ItemName
+                    Write-Output "`n $ErrorMessage "
+                    Write-Output "`n $FailedItem "
+                }
+                try {
+                    Write-ProgressHelper -Message "Removing Ec2Vpc" -Sleep 1 -StepNumber ($stepCounter++) -TotalS $TS
+                    Remove-EC2Vpc -VpcId $VPCId -Region $Region -Force
+                } catch {
+                    $ErrorMessage = $_.Exception.Message
+                    $FailedItem = $_.Exception.ItemName
+                    Write-Output "`n $ErrorMessage "
+                    Write-Output "`n $FailedItem "
+                }
             }
         }
+
     } catch {
   
         $ExceptionLevel = 0

@@ -18,7 +18,7 @@
 .PARAMETER InstanceType
 	The size of the VM
 .EXAMPLE
-	PS C:\> .\createServerVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -KeyFilePath "myPSKeyPair.pem" -InstanceType "t3.micro"
+	createServerVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -KeyFilePath "myPSKeyPair.pem" -InstanceType "t3.micro"PS C:\> .\createServerVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -KeyFilePath "myPSKeyPair.pem" -InstanceType "t3.micro"
 	Set's up the machine with the Values
 .EXAMPLE
 	PS C:\> .\createServerVM.ps1 -ProfileName "Screeps" -Region: "eu-west-3" -AvailabilityZone "eu-west-3b" -GroupName "Screeps" -Verbose

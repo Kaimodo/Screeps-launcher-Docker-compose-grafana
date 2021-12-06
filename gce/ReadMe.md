@@ -10,6 +10,11 @@
 
 Type `gcloud init --console-only` to initialize Cloud SDK
 
+## Create Project
+
+- got to ([New-Project on GCE](https://console.cloud.google.com/projectcreate)) Type in your project-name, we will use it later.
+- go to `https://console.cloud.google.com/apis/library/compute.googleapis.com?project=YOUR_PROJECT_NAME` and enable Compute Api.
+
 ## Run ps1-file
 
 `./createServer.ps1 -ProjectName "Screeps" -Zone "europe-west3-c"` is the minimal command. u can use `-Verbose` to get extra Info of what is going on.
