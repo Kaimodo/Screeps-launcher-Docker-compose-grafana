@@ -1,7 +1,19 @@
 #
-v1.1.6
+v1.1.7
 [2021-12-06]
 
+
+
+#
+v1.1.7
+[2021-12-06]
+
+### Features
+
+*
+No Auto-Creation of CFG-File
+([`5e70289`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/5e70289e6e512e44afddda86399b6d0ab8234efc))
+14-Files changed|18-Insertions|1411-Deletions
 
 
 #
