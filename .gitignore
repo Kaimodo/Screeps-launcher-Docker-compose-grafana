@@ -1,12 +1,8 @@
 # Files with personal-info manual folder
-/server/manual/config.yml
+/server/config.yml
 
-/server/manual/cfg/stats_setup.json
+/server/cfg/stats_setup.json
 
-# Files with personal-info auto folder
-/server/auto/config.yml
-
-/server/auto/cfg/stats_setup.json
 
 
 # yarn lock file

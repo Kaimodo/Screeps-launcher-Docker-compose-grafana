@@ -1,8 +1,20 @@
 #
-v1.1.5
-[2021-12-05]
+v1.1.6
+[2021-12-06]
 
 
+
+#
+v1.1.6
+[2021-12-06]
+
+
+### Fixes
+
+*
+Progress-Bar error on all files
+([`7276e62`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/7276e62bb0d84e673df28528800a4c721a54711e))
+8-Files changed|1514-Insertions|32-Deletions
 
 #
 v1.1.5
