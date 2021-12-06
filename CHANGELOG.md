@@ -1,11 +1,27 @@
 #
-v1.2.0
+v1.2.1
 [2021-12-06]
 
 
 
+#
+v1.2.1
+[2021-12-06]
+
+
+### Fixes
+
+*
+Edited ReadMe
+([`c491ff9`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/c491ff922f6024658282ab1dc85768b56864a436))
+2-Files changed|15-Insertions|1-Deletions
+
 ### Little Patch
 
+*
+patch: AWS/AZ Scripts should run now w/o Error
+([`3785299`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/3785299b69833f49de8c03c8a6ca72b458985626))
+5-Files changed|125-Insertions|68-Deletions
 *
 patch: Changelog
 ([`9867ccd`](https://github.com/Kaimodo/Screeps-launcher-Docker-compose-grafana/commit/9867ccd3f8de05fba8d8c1e92c5c1ce5679ed664))
